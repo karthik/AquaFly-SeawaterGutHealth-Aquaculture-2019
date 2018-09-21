@@ -3,8 +3,8 @@ library(ggplot2) # plotting
 library(ggrepel) # labelling
 library(reshape2) # convert data format (long/wide)
 library(NMF) # makeing heatmap
-library(nlme) ## running linear mixed model
-library(car) # tidy statistical outputs
+library(nlme) # running linear mixed model
+library(car) # performing box-cox transformation
 
 #######################################
 #                                     #
@@ -23,14 +23,10 @@ Sys.setlocale(category = "LC_ALL", locale = "Greek")
 # 3. Click Save As, name the file, and change the Encoding: to UTF-8.
 # 4. Change the file extension from "*.txt" to "*.csv".
 
-df_pi <- read.csv("C:/Users/ljt89/OneDrive - Norwegian University of Life Sciences/Code demo/AqFl2_qPCR_PI_Target.csv", 
-                  header = T, na.strings=c(""), encoding = "UTF-8")
-
-df_pi <- read.csv("Z:/PhD/Lab/qPCR/AqFl2/R/AqFl2_qPCR_PI_Target.csv", header =T, na.strings=c(""), encoding = "UTF-8")
-
+df_pi <- read.csv("./data/AqFl2_qPCR_PI_Target.csv", header = T, na.strings=c(""), encoding = "UTF-8")
 head(df_pi)
 
-# Tidying data and calculate new variables ##########################################################################################################
+# Tidying data and calculate new variables ############################################################################
 df_pi1 <- df_pi %>% 
   rename(Sample_ID = X.U.FEFF.Sample_ID) %>% # remove "X.U.FEFF." from the column name, which was reserved to tell that the file is in UTF-8 format.
   select(-Comments) %>% # remove the "Comments" column
@@ -44,7 +40,7 @@ df_pi1 <- df_pi %>%
 
 head(df_pi1)
 
-# Plotting ##########################################################################################################################################
+# Plotting ############################################################################################################
 # Before plotting, first, convert numeric variable to string
 df_pi1 <- within(df_pi1, {
   Sample_ID <- as.character(Sample_ID)
@@ -54,17 +50,19 @@ df_pi1 <- within(df_pi1, {
 # Then, convert "Diet" and "Target" to factor variables with the desired order
 df_pi1$Diet <- factor(df_pi1$Diet, levels = c("REF", "IM100"))
 
-df_pi1$Target <- factor(df_pi1$Target, levels = c("myd88", "il1β", "tnfα", "il6", "il8", "cd3γδ", "cd8β", "mhcI", "ifnγ",
-                                                  "il17a", "foxp3", "il10", "tgfβ1", "il4", "plin2", "mtp", "apoa1", "apoa4", 
-                                                  "apob", "chk", "pcyt1a", "fabp2b", "aqp8ab", "cldn15", "cldn25b", "zo1",
-                                                  "cdh1", "muc2",  "cyp1a1", "mta", "hsp70",  "sod1", "cat", "casp6", "pcna", 
-                                                  "mmp13")) 
+df_pi1$Target <- factor(df_pi1$Target, levels = c("myd88", "il1β", "tnfα", "il6", "il8", "cd3γδ", "cd8β", "mhcI", 
+                                                  "ifnγ","il17a", "foxp3", "il10", "tgfβ1", "il4", "plin2", "mtp", 
+                                                  "apoa1", "apoa4", "apob", "chk", "pcyt1a", "fabp2b", "aqp8ab", 
+                                                  "cldn15", "cldn25b", "zo1", "cdh1", "muc2",  "cyp1a1", "mta", 
+                                                  "hsp70", "sod1", "cat", "casp6", "pcna", "mmp13")) 
+                                                 
 
-# Make boxplot --------------------------------------------------------------------------------------------------------------------------------------
+# Make boxplot --------------------------------------------------------------------------------------------------------
 # First, define a function for identifying outliers
 is_outlier <- function(x) {
   x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x)
 }
+
 # Make boxplot for genes under different functional categories
 box_imu_pi <- df_pi1 %>%
   filter(Target_func == "Immune_modulation") %>%
@@ -154,7 +152,7 @@ box_xno_pi <- df_pi1 %>%
         legend.direction="horizontal", 
         legend.position="bottom") 
 
-# Make heatmap --------------------------------------------------------------------------------------------------------------------------------------
+# Make heatmap --------------------------------------------------------------------------------------------------------
 # Convert the data format from "long" to "wide"
 df_pi_wide <- dcast(df_pi1, Sample_ID + Diet + Net_pen ~ Target, value.var="MNE") %>%
   arrange(Diet, Net_pen) 
@@ -162,9 +160,11 @@ df_pi_wide <- dcast(df_pi1, Sample_ID + Diet + Net_pen ~ Target, value.var="MNE"
 # Make a numeric matrix for heatmap plotting
 nmp  <- select(df_pi_wide, -Sample_ID, -Diet, -Net_pen) %>%
   data.matrix()
+
 # Assign Sample_ID as row name and transpose the matrix
 rownames(nmp) <- df_pi_wide[,1]
 nmp_t <- t(nmp)
+
 # Make column and row annoation 
 annCol <- select(df_pi_wide, Diet, Net_pen)
 
@@ -176,7 +176,8 @@ annRow$function_category <- factor(annRow$function_category, levels = c("Immune_
                                                                         "lipid_metabolism",
                                                                         "barrier_function",
                                                                         "xenobiotic_matebolism"))
-# Plotting
+
+# Make heatmap
 tiff('heatmap_PI.tiff', units="in", width=16, height=9, res=300)
 aheatmap(nmp_t, 
          border_color = "grey60",
@@ -191,7 +192,7 @@ aheatmap(nmp_t,
          annRow = annRow)             
 dev.off()
 
-# Make Barplot showing fold change of gene expression -----------------------------------------------------------------------------------------------
+# Make Barplot showing fold change of gene expression -----------------------------------------------------------------
 df_pi2 <- df_pi1 %>%
   filter(Diet == "REF") %>%
   group_by(Target) %>%
@@ -231,7 +232,7 @@ bar_pi <- ggplot(df_pi3, aes(x = Target, y = Mean_fold_change, fill = Target_fun
         axis.title.y = element_blank())
 
 
-# Run linear mixed model and tidy model output #####################################################################################################
+# Statistics ##########################################################################################################
 # Convert Diet and Target back to character, otherwise the split function won't work correctly
 df_pi1$Diet <- as.character(df_pi1$Diet)
 df_pi1$Target <- as.character(df_pi1$Target)
@@ -239,16 +240,16 @@ df_pi1$Target <- as.character(df_pi1$Target)
 # Split the data frames by "Target"
 df_pi1_spl <- split(df_pi1, f = df_pi1$Target)
 
-# `lapply()` linear mixed model to each data frame in the list and store results as a list
+# lapply() linear mixed model to each data frame in the list and store results as a list
 lme_pi <- lapply(df_pi1_spl, function(x) lme(MNE ~ Diet, random = ~1|Net_pen, data = x))
 
-# Model summary and extract p values of the Diet effect.
+# Get model summary and extract p values of the Diet effect.
 summary_pi <- lapply(lme_pi, function(x) summary(x))
 
 p_values_pi <-
   
   
-  # Model diagnostics ############################################################################################################
+# Model diagnostics ---------------------------------------------------------------------------------------------------
 # Extract residuals
 res_pi <- lapply(lme_pi, function(x) resid(x))
 
@@ -269,7 +270,7 @@ lapply(lme_pi, function(x) plot(x))
 dev.off()
 
 # 2.Absence of collinearity. When more than one fixed effects are included, the collinearity shoulb be checked.
-# Not applicable to the present data, which have only one fixed effect
+# Not applicable to the present dataset, which has only one fixed effect
 
 # 3.Normality of residuals
 
