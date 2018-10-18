@@ -1,11 +1,11 @@
 library(dplyr) # data manipulation
 library(ggplot2) # plotting
 library(reshape2) # convert data format (long/wide)
-library(stats) # for running fisher's exact test
+library(ordinal) # for running ordered logistic regression
 
 # import data
-df <- read.csv("z:/PhD/Lab/Histology/AquaFl2/R/AquaFly2-Histology-R.csv", header = T, na.strings = c(""))
-head(df)
+df <- read.csv("./data/AqFl2_histology.csv", header = T, na.strings = c(""))
+df
 
 # convert numeric Variable to string
 df <- within(df, {
@@ -13,7 +13,7 @@ df <- within(df, {
   Sample_ID <- as.character(Sample_ID)
 })
 
-# code for making contingency table from raw data, not used in downstream analysis######################################
+# code for making contingency table from raw data. Not used in downstream analysis#####################################
 df_contingency <- df %>% 
   tidyr::gather("Variable", "Class", 4:ncol(df)) %>% # convert data to the long format
   na.omit() %>% 
@@ -22,7 +22,7 @@ df_contingency <- df %>%
   dcast(., Variable + Diet ~ Class, value.var="observation") %>% # convert data to the wide format
   arrange(desc(Variable), desc(Diet))
 
-# Plotting #############################################################################################################
+# Plotting ############################################################################################################
 # edit and summarize data for plotting
 df_plot <- df %>% 
   tidyr::gather("Variable", "Class", 4:ncol(df)) %>% # convert dataframe to the "long" format
@@ -55,22 +55,45 @@ p_histo <- ggplot(df_plot, aes(Diet, percent, fill = Class)) +
   theme(plot.title = element_text(size = 15, 
                                   face = "bold", hjust = 0.5))
 
-####################################################################################################################### 
+# statistics ##########################################################################################################
 # convert dataframe to the "long" format
 df_long <- df %>% 
   tidyr::gather("Variable", "Class", 4:ncol(df)) %>% 
-  na.omit()
+  na.omit() 
+ 
+# convert "Class" to ordered factor
+df_long$Class <- ordered(df_long$Class, levels = c("Normal", "Mild", "Moderate", "Marked", "Severe"))
 
 # Split the data frames by "Variable" 
-df_split <- split(df_long, f = df_long$Variable)
+df_spl <- split(df_long, f = df_long$Variable)
 
-# `lapply()` fisher's exaxt test to each data frame in the list and store results as a list  
-fisher_test_list <- lapply(df_split, function(x) fisher.test(x$Diet, x$Class))  
+# run cumulative link mixed model for each dataframe, treating "Diet" as fixed effect and "Net_pen" as random effect
+mod_ful <- lapply(df_spl, function(x) clmm(Class ~ Diet + (1|Net_pen), data = x))
 
-# Extract p values, store them in a data frame and apply multiple comparison correction
-fisher_test <- data.frame(row.names = NULL,
-                          "Histological_characteristic" = names(fisher_test_list),
-                          "p_raw" = unlist(lapply(fisher_test_list, function(x) x[[1]]))) # Extract p values of fisher's test from the list
+mod_sub <- lapply(df_spl, function(x) clm(Class ~ Diet, data = x))
 
-fisher_test$p_adjusted <- p.adjust(fisher_test$p_raw, method = "fdr")
+summary_ful <- lapply(mod_ful, function(x) summary(x))
+summary_sub <- lapply(mod_sub, function(x) summary(x))
+anova_sub <- lapply(mod_sub, function(x) anova(x))
+
+mod_select <- data.frame(row.names = NULL, 
+                         "Variable" = names(summary_ful),
+                         "AIC_ful" = unlist(lapply(summary_ful, function(x) x[["info"]][["AIC"]])),
+                         "AIC_sub" = unlist(lapply(summary_sub, function(x) x[["info"]][["AIC"]])),
+                         "Hessian_ful" = unlist(lapply(summary_ful, function(x) x[["info"]][["cond.H"]])),
+                         "Hessian_sub" = unlist(lapply(summary_sub, function(x) x[["info"]][["cond.H"]]))
+)
+
+p_values_sub <- data.frame(row.names = NULL, 
+                           "Variable" = names(anova_sub),
+                           "p_raw" = unlist(lapply(anova_sub, function(x) x[[3]]))
+)
+
+sig <- p_values_sub[8:10, ] %>%
+  mutate(p_adjusted =  p.adjust(p_raw, method = "bonferroni"))
+  
+# Model assumption checking
+nominal_test_sub <- lapply(mod_sub, function(x) nominal_test(x))
+
+
 

@@ -1,9 +1,11 @@
 library(dplyr) # data manipulation
 library(ggplot2) # plotting
+library(ggrepel) # labelling
+library(ggsignif) # adding significant levels to plot
 library(nlme) # running linear mixed model
 
 df <- read.csv("./data/AqFl2_organ_somatic_index.csv", header = T, na.strings = c(""))
-df
+head(df)
 
 # convert numeric variable to string
 df <- within(df, {
@@ -11,35 +13,65 @@ df <- within(df, {
     Net_pen <- as.character(Net_pen)
 })
 
-# Reorder varialbes in the desired order
+# Calculate organosomatic index
+df <- df %>%
+  mutate(Organ_somatic_index = 100*Organ_weight/Body_weight)
+  
+# Reorder varialbes in the desired order 
 df$Diet <- factor(df$Diet, levels = c("REF", "IM33", "IM66", "IM100"))
 df$Gut_segment <- factor(df$Gut_segment, levels = c("PI", "MI", "DI"))
                 
-# Exploratory analysis ####################################################################################### 
-# Check outliers and data distribution
-# tiff(filename = "./results/figures/organosomatic_indices.eps", units = "in", res = 300, compression = "lzw") #File too large. Won't work. 
+# Exploratory analysis ################################################################################################ 
+# Violin plot to check data distribution
 df %>% 
   filter(Diet %in% c('REF', 'IM100')) %>% 
-  ggplot(., aes(x = Diet, y = Organ_somatic_index)) + 
-  geom_boxplot(aes(fill = Diet)) + 
-  facet_wrap(~Gut_segment, ncol = 3, scales = "free_y") + 
-  expand_limits(y = 0) + 
-  labs(title = "Organosomatic indices", y = "Organosomatic index") +
-  theme(axis.text.x=element_text(size = 18),
-        axis.text.y=element_text(size = 18),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 18),
-        #strip.background = element_blank(),
-        strip.placement = "outside",
-        strip.text = element_text(face="bold", size=18),
-        legend.text=element_text(face="bold",size=18),
-        legend.title=element_text(face="bold",size=20),
-        plot.title = element_text(size = 20, face = "bold",hjust = 0.5)) 
-# dev.off()
-ggsave("organosomatic_indices.tiff", units = "in", dpi = 300, compression = "lzw", path = "./results/figures")
+  ggplot(aes(x = Diet, y = Organ_somatic_index)) + 
+    geom_violin(aes(fill = Diet), trim = FALSE) +
+    facet_wrap(~Gut_segment, nrow = 1, scales = "free_y") +
+    stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1), geom = "pointrange") + # add mean and SD 
+    expand_limits(y = 0) + 
+    labs(title = "Organosomatic indices", y = "Organosomatic index") +
+    theme(axis.text.x=element_text(size = 18), 
+          axis.text.y=element_text(size = 18),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 18),
+          strip.text = element_text(face="bold", size=18),
+          legend.text=element_text(face="bold",size=18),
+          legend.title=element_text(face="bold",size=20),
+          plot.title = element_text(size = 20, face = "bold",hjust = 0.5)
+          ) 
+
+# Box plot to check outliers
+# Define a function for identifying outliers
+is_outlier <- function(x) {
+  x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x)
+}
+
+# Make box plot with dots
+df %>% 
+  filter(Diet %in% c('REF', 'IM100')) %>%
+  group_by(Gut_segment, Diet) %>%
+  mutate(outlier = is_outlier(Organ_somatic_index)) %>% # mark outliers within each diet group
+  ggplot(aes(x = Diet, y = Organ_somatic_index,label = ifelse(outlier, Sample_ID, NA))) +
+    geom_boxplot(outlier.shape = NA) +
+    geom_point(aes(fill = Net_pen), size = 2, shape = 21, position = position_jitterdodge(0.2)) +
+    facet_wrap(~ Gut_segment, nrow = 1, scales="free_y") +
+    geom_label_repel() +
+    labs(title = "Organosomatic indices", y = "Organosomatic index") +
+    theme_bw() +
+    theme(axis.title.x = element_text(size = 16),
+          axis.text.x = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.text.y = element_text(size = 14),
+          plot.title = element_text(size = 18, face = "bold",hjust = 0.5),
+          strip.text = element_text(size = 16),
+          legend.title = element_text(size = 16),
+          legend.text = element_text(size = 16),
+          legend.direction="horizontal", 
+          legend.position="bottom") 
 
 # Statistics ##########################################################################################################
-# Convert Diet and Target back to character, otherwise the split function won't work correctly
+# Convert Diet and Target back to character
 df$Diet <- as.character(df$Diet)
 df$Gut_segment <- as.character(df$Gut_segment)
 
@@ -56,9 +88,10 @@ summary <- lapply(lme, function(x) summary(x))
 anova <- lapply(lme, function(x) anova(x))
 
 p_values <- data.frame(row.names = NULL,
-  "Gut segment" = names(lme),
-  "p values" = unlist(lapply(anova, function(x) x[[4]][[2]]))
-)
+                       "Gut_segment" = names(lme),
+                       "p_values" = unlist(lapply(anova, function(x) x[[4]][[2]]))
+                       ) %>% 
+  arrange(desc(Gut_segment)) 
   
   
 # Model diagnostics ---------------------------------------------------------------------------------------------------
@@ -66,7 +99,8 @@ p_values <- data.frame(row.names = NULL,
 res <- lapply(lme, function(x) resid(x))
 
 # 1.Linearity and homoskedasticity of residuals
-pdf(file = "./results/statistical outputs/resid_plot_organosomatic_indices.pdf", encoding = "CP1253") # turn on pdf graphics device
+pdf(file = "./results/statistics/resid_plot_organosomatic_indices.pdf") # turn on pdf graphics device
+
 lapply(
   seq_along(res), # add index to the elements in the list
   function(x) 
@@ -75,6 +109,7 @@ lapply(
     abline(0,0)
   }
 )
+
 dev.off() # turn off the device
 
 # 2.Absence of collinearity. When more than one fixed effects are included, the collinearity shoulb be checked.
@@ -82,7 +117,8 @@ dev.off() # turn off the device
 
 # 3.Normality of residuals
 
-pdf(file = "./results/statistical outputs/qqplot_organosomatic_indices.pdf", encoding = "CP1253")
+pdf(file = "./results/statistics/qqplot_organosomatic_indices.pdf")
+
 lapply(
   seq_along(res), 
   function(x) 
@@ -91,6 +127,59 @@ lapply(
     qqline(res[[x]])
   }
 )
+
 dev.off()
 
 # 4.Absence of influential data points
+
+# Make Figure 1 #######################################################################################################
+# Reorder varialbes in the desired order 
+df$Diet <- factor(df$Diet, levels = c("REF", "IM33", "IM66", "IM100"))
+df$Gut_segment <- factor(df$Gut_segment, levels = c("PI", "MI", "DI"))
+
+# Make a function for setting the number of decimals of y axis
+fmt_dcimals <- function(decimals=0){
+  function(x) format(x,nsmall = decimals,scientific = FALSE)
+}
+
+# Initial plot
+fig1 <- df %>% 
+  filter(Diet %in% c('REF', 'IM100')) %>%
+  ggplot(aes(x = Diet, y = Organ_somatic_index)) +
+    geom_boxplot(aes(fill = Diet), outlier.shape = NA, show.legend = FALSE) +
+    geom_jitter(shape = 16, position = position_jitter(0.2)) +
+    facet_wrap(~ Gut_segment, nrow = 1, scales="free_y") +
+    scale_y_continuous(limits = c(0, NA), labels = fmt_dcimals(1)) +
+    labs(y = "Organosomatic index") +
+    theme_bw() +
+    theme(axis.title.x = element_text(size = 18),
+          axis.text.x = element_text(size = 14),
+          axis.title.y = element_text(size = 18, margin = margin(t = 0, r = 10, b = 0, l = 0)),
+          axis.text.y = element_text(size = 14),
+          strip.text = element_text(size = 16)
+          ) 
+
+# Add significant p values to the plot
+# First, make a datafraome for the annotation
+anno <- p_values %>%
+  arrange(Gut_segment) %>%
+  filter(p_values <= 0.05) %>%
+  mutate(start = rep("REF", nrow(.))) %>%
+  mutate(end = rep("IM100", nrow(.))) %>%
+  mutate(y = c(0.47)) 
+  
+# Add the p values. The warning about the missing aesthetics can be ignored.
+fig1 + geom_signif(data = anno, 
+                   aes(xmin = start, 
+                       xmax = end, 
+                       annotations = formatC(as.numeric(p_values), digits = 3), 
+                       y_position = y),
+                   textsize = 4, 
+                   tip_length = 0.01,
+                   manual = TRUE)
+# Save the figure
+ggsave("Figure 1. Organosomatic indices.tiff", 
+       units = "in", 
+       dpi = 300, 
+       compression = "lzw", 
+       path = "./results/figures")

@@ -64,13 +64,14 @@ is_outlier <- function(x) {
 }
 
 # Make boxplot for genes under different functional categories
-box_imu_pi <- df_pi1 %>%
+pdf(file = "./results/exploratory analysis/boxplot_qPCR_PI.pdf", encoding = "CP1253") 
+df_pi1 %>%
   filter(Target_func == "Immune_modulation") %>%
   group_by(Target, Diet) %>%
   mutate(outlier = is_outlier(MNE)) %>% # mark outliers within each diet group
   ggplot(aes(x=Diet, y=MNE,label = ifelse(outlier, Sample_ID, NA))) +
   geom_boxplot(outlier.shape = NA) +
-  geom_point(aes(fill = Net_pen),size = 2, shape = 21, position = position_jitterdodge(0.2)) +
+  geom_point(aes(fill = Net_pen), size = 2, shape = 21, position = position_jitterdodge(0.2)) +
   facet_wrap(~ Target, ncol = 4,scales="free_y") +
   geom_label_repel() +
   theme_bw() +
@@ -86,7 +87,7 @@ box_imu_pi <- df_pi1 %>%
         legend.direction="horizontal", 
         legend.position="bottom") 
 
-box_lpi_pi <- df_pi1 %>%
+df_pi1 %>%
   filter(Target_func == "lipid_metabolism") %>%
   group_by(Target, Diet) %>%
   mutate(outlier = is_outlier(MNE)) %>% # mark outliers within each diet group
@@ -108,7 +109,7 @@ box_lpi_pi <- df_pi1 %>%
         legend.direction="horizontal", 
         legend.position="bottom") 
 
-box_brr_pi <- df_pi1 %>%
+df_pi1 %>%
   filter(Target_func == "barrier_function") %>%
   group_by(Target, Diet) %>%
   mutate(outlier = is_outlier(MNE)) %>% # mark outliers within each diet group
@@ -130,7 +131,7 @@ box_brr_pi <- df_pi1 %>%
         legend.direction="horizontal", 
         legend.position="bottom") 
 
-box_xno_pi <- df_pi1 %>%
+df_pi1 %>%
   filter(Target_func == "xenobiotic_matebolism") %>%
   group_by(Target, Diet) %>%
   mutate(outlier = is_outlier(MNE)) %>% # mark outliers within each diet group
@@ -151,7 +152,7 @@ box_xno_pi <- df_pi1 %>%
         legend.text = element_text(size = 16),
         legend.direction="horizontal", 
         legend.position="bottom") 
-
+dev.off()
 # Make heatmap --------------------------------------------------------------------------------------------------------
 # Convert the data format from "long" to "wide"
 df_pi_wide <- dcast(df_pi1, Sample_ID + Diet + Net_pen ~ Target, value.var="MNE") %>%
@@ -178,10 +179,10 @@ annRow$function_category <- factor(annRow$function_category, levels = c("Immune_
                                                                         "xenobiotic_matebolism"))
 
 # Make heatmap
-tiff('heatmap_PI.tiff', units="in", width=16, height=9, res=300)
+tiff(filename = "./results/exploratory analysis/heatmap_qPCR_PI.tif", compression = "lzw", 
+     units="in", res=300, width=16, height=9)
 aheatmap(nmp_t, 
          border_color = "grey60",
-         #filename = "p_heatmap.tiff",
          Rowv = NA,
          Colv = NA,
          fontsize = 14,
@@ -192,7 +193,7 @@ aheatmap(nmp_t,
          annRow = annRow)             
 dev.off()
 
-# Make Barplot showing fold change of gene expression -----------------------------------------------------------------
+# Make bar plot showing fold change of gene expression -----------------------------------------------------------------
 df_pi2 <- df_pi1 %>%
   filter(Diet == "REF") %>%
   group_by(Target) %>%
@@ -241,20 +242,29 @@ df_pi1$Target <- as.character(df_pi1$Target)
 df_pi1_spl <- split(df_pi1, f = df_pi1$Target)
 
 # lapply() linear mixed model to each data frame in the list and store results as a list
-lme_pi <- lapply(df_pi1_spl, function(x) lme(MNE ~ Diet, random = ~1|Net_pen, data = x))
+lme_pi <- lapply(df_pi1_spl, function(x) lme(MNE ~ Diet, 
+                                             random = ~1|Net_pen, 
+                                             varPower(form=~fitted(.)), 
+                                             data = x))
 
 # Get model summary and extract p values of the Diet effect.
 summary_pi <- lapply(lme_pi, function(x) summary(x))
 
-p_values_pi <-
-  
-  
+anova_pi <- lapply(lme_pi, function(x) anova(x))
+
+p_values_pi <- data.frame(row.names = NULL,
+                          "Gene_of_interest" = names(lme_pi),
+                          "p_raw" = unlist(lapply(anova_pi, function(x) x[[4]][[2]]))
+)
+
+p_values_pi$p_adjusted <- p.adjust(p_values_pi$p_raw, method = "fdr")
+
 # Model diagnostics ---------------------------------------------------------------------------------------------------
 # Extract residuals
 res_pi <- lapply(lme_pi, function(x) resid(x))
 
 # 1.Linearity and homoskedasticity of residuals
-pdf("resid_plot_PI.pdf", encoding = "CP1253") # turn on pdf graphics device
+pdf(file = "./results/statistics/resid_plot_qPCR_PI.pdf", encoding = "CP1253") # turn on pdf graphics device
 lapply(
   seq_along(res_pi), # add index to the elements in the list
   function(x) 
@@ -274,7 +284,7 @@ dev.off()
 
 # 3.Normality of residuals
 
-pdf("qqplot_PI.pdf", encoding = "CP1253")
+pdf(file = "./results/statistics/qqplot_qPCR_PI.pdf", encoding = "CP1253")
 lapply(
   seq_along(res_pi), 
   function(x) 
