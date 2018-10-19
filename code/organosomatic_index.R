@@ -1,11 +1,9 @@
-library(dplyr) # data manipulation
-library(ggplot2) # plotting
+library(tidyverse) # tidy, manipulate and plot data
 library(ggrepel) # labelling
-library(ggsignif) # adding significant levels to plot
-library(nlme) # running linear mixed model
 
 df <- read.csv("./data/AqFl2_organ_somatic_index.csv", header = T, na.strings = c(""))
-head(df)
+head(df, n = 20L)
+str(df)
 
 # convert numeric variable to string
 df <- within(df, {
@@ -70,7 +68,12 @@ df %>%
           legend.direction="horizontal", 
           legend.position="bottom") 
 
+# raincloud plot
+
+
 # Statistics ##########################################################################################################
+library(nlme) # running linear mixed model
+
 # Convert Diet and Target back to character
 df$Diet <- as.character(df$Diet)
 df$Gut_segment <- as.character(df$Gut_segment)
@@ -169,6 +172,8 @@ anno <- p_values %>%
   mutate(y = c(0.47)) 
   
 # Add the p values. The warning about the missing aesthetics can be ignored.
+library(ggsignif) # adding significant levels to plot
+
 fig1 + geom_signif(data = anno, 
                    aes(xmin = start, 
                        xmax = end, 
