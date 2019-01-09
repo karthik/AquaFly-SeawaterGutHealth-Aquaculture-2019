@@ -20,7 +20,7 @@ df <- df %>%
  
 # Exploratory analysis ################################################################################################ 
 # Convert character to factor, specifying the desired orders to be shown on plots
-df$Diet <- factor(df$Diet, levels = c("REF", "IM100"))
+df$Diet <- factor(df$Diet, levels = c("REF", "IM"))
 df$Sample_ID <- factor(df$Sample_ID, levels = unique(df$Sample_ID)) # use the exact order of Sample_ID column
 
 # Point diagram -----------------------------------------------------------------------------------

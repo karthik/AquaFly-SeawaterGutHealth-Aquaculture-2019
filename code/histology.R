@@ -26,7 +26,7 @@ df <- df %>%
          
 # Exploratory analysis #########################################################
 # Convert variables to factors, specifying the desired orders shown on plots
-df$Diet <- factor(df$Diet, levels = c("REF", "IM100"))
+df$Diet <- factor(df$Diet, levels = c("REF", "IM"))
 df$Net_pen <- factor(df$Net_pen, levels = unique(df$Net_pen))
 df$Gut_segment <- factor(df$Gut_segment, levels = c("PI", "MI", "DI"))
 df$Variable <- factor(df$Variable, levels = c("hpv", "snv", "smc", "lpc", "mfh"))
@@ -261,7 +261,7 @@ ann <- p_diet %>%
          p_diet_adj = formatC(p_diet_adj, format = "f", digits = 3), # format digits of p values
          p_diet_adj = paste("p = ", p_diet_adj), # add label "p =" to p values
          start = rep("REF", nrow(.)), # start position of p value label on x axis
-         end = rep("IM100", nrow(.)), # end position of p value label on x axis
+         end = rep("IM", nrow(.)), # end position of p value label on x axis
          y = rep(103, nrow(.)) # position of p value label on y axis
          ) 
  
