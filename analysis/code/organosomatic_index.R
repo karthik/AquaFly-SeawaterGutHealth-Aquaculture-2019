@@ -1,7 +1,8 @@
 library(tidyverse) # tidy, manipulate and plot data
-library(cowplot) #  a ggplot2 add-on to provide a publication-ready theme 
-library(nlme) # run linear mixed model
-library(ggsignif) # add p values to plot
+library(cowplot) #  a ggplot2 add-on to provide a publication-ready theme
+library(ggsignif) # add p values to plots
+library(lme4) # run linear mixed effect model
+library(influence.ME) # detect influential data in mixed effects models 
 
 # Import and tidy data #########################################################
 df <- read.csv("./data/raw_data/AqFl2_organosomatic_index.csv", 
@@ -59,9 +60,11 @@ df %>%
   mutate(outlier = is_outlier(OSI)) %>% # mark outliers within each diet for each gut segment
   ggplot(aes(x = Diet, y = OSI, label = ifelse(outlier, Sample_ID, NA))) +
     geom_boxplot(outlier.shape = NA) +
-    geom_point(aes(fill = Net_pen), size = 2, shape = 21, 
+    geom_point(aes(fill = Net_pen), 
+               size = 2, 
+               shape = 21, 
                position = position_jitterdodge(0.2)) +
-    facet_wrap(~ Gut_segment, nrow = 1, scales="free_y") +
+    facet_wrap(~ Gut_segment, nrow = 1, scales = "free_y") +
     ggrepel::geom_label_repel() + # label outliers using Sample_ID
     scale_y_continuous(limits = c(0, NA), 
                        labels = fmt_dcimals(1), 
@@ -79,31 +82,18 @@ df_spl <- df %>%
   split(f = .$Gut_segment)
 
 # Run linear mixed model for each data frame using lapply()
-lme <- lapply(df_spl, function(x) lme(OSI ~ Diet, 
-                                      random = ~1|Net_pen, 
-                                      varPower(form = ~ fitted(.)), 
-                                      data = x)
-              )
-
-# Get model summary and extract p values of the Diet effect
-smr <- lapply(lme, function(x) summary(x))
-anv <- lapply(lme, function(x) anova(x))
-
-p_val <- data.frame(row.names = NULL,
-                    "Gut_segment" = names(lme),
-                    "p_values" = unlist(lapply(anv, function(x) x[[4]][[2]]))
-                    ) %>% 
-  arrange(desc(Gut_segment))    
-  
+mod <- lapply(df_spl, function(x) lmer(OSI ~ Diet + (~1|Net_pen), data = x)) 
+                
+                                      
 # Model diagnostics ------------------------------------------------------------
 # Extract residuals
-res <- lapply(lme, function(x) resid(x))
+res <- lapply(mod, function(x) resid(x))
 
 # 1.Linearity and homoskedasticity of residuals
 pdf(file = "./results/statistics/OSI_resid_plot.pdf") 
 
 lapply(
-  seq_along(res), # add index to the elements in the list "res" so that element names and contents can be extracted
+  seq_along(res), # add index to the elements in the list "res"  
   function(x) 
   {
     plot(res[[x]], main = names(res)[x], ylab = "residuals") # make residual plot for each model
@@ -113,8 +103,8 @@ lapply(
 
 dev.off() 
 
-# 2.Absence of collinearity. When more than one fixed effects are included, the collinearity shoulb be checked.
-# Not applicable to the present dataset, which has only one fixed effect
+# 2.Absence of collinearity. 
+# Not applicable 
 
 # 3.Normality of residuals
 pdf(file = "./results/statistics/OSI_qqplot.pdf")
@@ -137,6 +127,13 @@ dev.off()
 # point in MI. From the boxplot we can tell that leaving out this data point 
 # won't affect the conclusion (significant or not). Hence, there's no need to 
 # run a new test.
+
+# Get p values of the Diet effect ----------------------------------------------
+p_val <- data.frame(row.names = NULL,
+                    "Gut_segment" = names(mod),
+                    "p_values" = unlist(lapply(anv, function(x) x[[4]][[2]]))
+                    ) %>% 
+  arrange(desc(Gut_segment))
 
 # Make Figure 1 ################################################################
 # Initial plot
