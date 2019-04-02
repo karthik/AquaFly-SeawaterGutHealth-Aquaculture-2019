@@ -53,7 +53,7 @@ p2 <- df %>%
 # Combine the plots
 plot_grid(p1, p2, ncol = 1, align = "v", rel_heights = c(3, 2))
 
-ggsave('./results/exploratory_analysis/qPCR_ref_PI_pointDiagram.pdf', 
+ggsave('./analysis/exploratory_analysis/qPCR_ref_PI_pointDiagram.pdf', 
        units = "in", 
        dpi = 300,
        height = 10,
@@ -79,7 +79,7 @@ df %>%
   ylab("standardized mRNA quantity") +
   theme_cowplot()
 
-ggsave('./results/exploratory_analysis/qPCR_ref_PI_boxPlot.pdf', units = "in", dpi = 300)
+ggsave('./analysis/exploratory_analysis/qPCR_ref_PI_boxPlot.pdf', units = "in", dpi = 300)
 
 # Barplot -----------------------------------------------------------------------------------------
 df %>%
@@ -93,7 +93,7 @@ df %>%
   theme(axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12))
 
-ggsave('./results/exploratory_analysis/qPCR_ref_PI_barPlot.pdf', units = "in", dpi = 300)
+ggsave('./analysis/exploratory_analysis/qPCR_ref_PI_barPlot.pdf', units = "in", dpi = 300)
 
 # Rank reference genes by coefficient of variation and F statistic ###################################################
 # Calculate coefficient of variance (cv), measuring overall stability of reference genes across all the samples
@@ -129,9 +129,9 @@ smr$Quantity_CV <- formatC(smr$Quantity_CV, format = "f", digits = 1)
 smr$Quantity_F <- formatC(smr$Quantity_F, format = "f", digits = 4)
 
 # Export summary table
-pdf('./results/statistics/qPCR_ref_evaluation_PI.pdf', width = 12)
+pdf('./results/reference_gene_ranks/ref_gene_rank_PI.pdf', width = 12)
 gridExtra::grid.table(smr)
 dev.off()
 
 # Get session info
-writeLines(capture.output(sessionInfo()), "./code/qPCR_ref_PI_sessionInfo.txt")
+writeLines(capture.output(sessionInfo()), "./analysis/code/qPCR_ref_PI_sessionInfo.txt")
