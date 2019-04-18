@@ -1,4 +1,4 @@
-R version 3.5.1 (2018-07-02)
+R version 3.5.2 (2018-12-20)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 Running under: Windows >= 8 x64 (build 9200)
 
@@ -12,20 +12,22 @@ attached base packages:
 [1] grid      stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] bindrcpp_0.2.2        ComplexHeatmap_1.20.0 nlme_3.1-137          cowplot_0.9.3         forcats_0.3.0         stringr_1.3.1        
- [7] dplyr_0.7.8           purrr_0.2.5           readr_1.3.1           tidyr_0.8.2           tibble_1.4.2          ggplot2_3.1.0        
-[13] tidyverse_1.2.1      
+ [1] pbkrtest_0.4-7        influence.ME_0.9-9    lme4_1.1-21           Matrix_1.2-17         ComplexHeatmap_1.99.7
+ [6] ggpubr_0.2.999        magrittr_1.5          forcats_0.4.0         stringr_1.4.0         dplyr_0.8.0.1        
+[11] purrr_0.3.2           readr_1.3.1           tidyr_0.8.3           tibble_2.1.1          ggplot2_3.1.1        
+[16] tidyverse_1.2.1      
 
 loaded via a namespace (and not attached):
- [1] ggrepel_0.8.0       Rcpp_1.0.0          lubridate_1.7.4     lattice_0.20-38     circlize_0.4.5      digest_0.6.18      
- [7] assertthat_0.2.0    R6_2.3.0            cellranger_1.1.0    plyr_1.8.4          backports_1.1.3     acepack_1.4.1      
-[13] httr_1.4.0          pillar_1.3.1        GlobalOptions_0.1.0 rlang_0.3.0.1       lazyeval_0.2.1      readxl_1.2.0       
-[19] data.table_1.11.8   rstudioapi_0.8      GetoptLong_0.1.7    rpart_4.1-13        Matrix_1.2-15       checkmate_1.8.5    
-[25] labeling_0.3        splines_3.5.1       foreign_0.8-71      htmlwidgets_1.3     munsell_0.5.0       broom_0.5.1        
-[31] xfun_0.4            compiler_3.5.1      modelr_0.1.2        pkgconfig_2.0.2     base64enc_0.1-3     shape_1.4.4        
-[37] htmltools_0.3.6     nnet_7.3-12         tidyselect_0.2.5    gridExtra_2.3       htmlTable_1.12      Hmisc_4.1-1        
-[43] crayon_1.3.4        withr_2.1.2         jsonlite_1.6        gtable_0.2.0        magrittr_1.5        scales_1.0.0       
-[49] cli_1.0.1           stringi_1.2.4       reshape2_1.4.3      latticeExtra_0.6-28 xml2_1.2.0          generics_0.0.2     
-[55] Formula_1.2-3       rjson_0.2.20        RColorBrewer_1.1-2  tools_3.5.1         glue_1.3.0          hms_0.4.2          
-[61] survival_2.43-3     yaml_2.2.0          colorspace_1.3-2    cluster_2.0.7-1     rvest_0.3.2         knitr_1.21         
-[67] bindr_0.1.1         haven_2.0.0        
+ [1] nlme_3.1-137        lubridate_1.7.4     RColorBrewer_1.1-2  httr_1.4.0          tools_3.5.2         backports_1.1.3    
+ [7] utf8_1.1.4          R6_2.4.0            rpart_4.1-13        Hmisc_4.2-0         lazyeval_0.2.2      colorspace_1.4-1   
+[13] nnet_7.3-12         GetoptLong_0.1.7    withr_2.1.2         tidyselect_0.2.5    gridExtra_2.3       compiler_3.5.2     
+[19] cli_1.1.0           rvest_0.3.2         htmlTable_1.13.1    xml2_1.2.0          labeling_0.3        scales_1.0.0       
+[25] checkmate_1.9.1     digest_0.6.18       foreign_0.8-71      minqa_1.2.4         base64enc_0.1-3     pkgconfig_2.0.2    
+[31] htmltools_0.3.6     htmlwidgets_1.3     rlang_0.3.4         GlobalOptions_0.1.0 readxl_1.3.1        rstudioapi_0.10    
+[37] shape_1.4.4         generics_0.0.2      jsonlite_1.6        acepack_1.4.1       Formula_1.2-3       Rcpp_1.0.1         
+[43] munsell_0.5.0       fansi_0.4.0         stringi_1.4.3       yaml_2.2.0          MASS_7.3-51.3       plyr_1.8.4         
+[49] parallel_3.5.2      ggrepel_0.8.0       crayon_1.3.4        lattice_0.20-38     haven_2.1.0         cowplot_0.9.99     
+[55] splines_3.5.2       circlize_0.4.6      hms_0.4.2           knitr_1.22          pillar_1.3.1        boot_1.3-20        
+[61] rjson_0.2.20        reshape2_1.4.3      glue_1.3.1          latticeExtra_0.6-28 data.table_1.12.2   modelr_0.1.4       
+[67] png_0.1-7           nloptr_1.2.1        cellranger_1.1.0    gtable_0.3.0        clue_0.3-57         assertthat_0.2.1   
+[73] xfun_0.6            broom_0.5.2         survival_2.44-1.1   cluster_2.0.7-1    
