@@ -10,7 +10,7 @@ df <- read_csv("data/raw_data/AqFl2_organosomatic_index.csv",
                col_names = T, 
                na = "")
 
-head(df)
+head(df, n = 20L)
 str(df)
 
 # Calculate organosomatic index (OSI)
