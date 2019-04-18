@@ -2,8 +2,9 @@ library(tidyverse) # tidy, manipulate and plot data
 library(broom) # tidy statistical outputs
 library(cowplot) #  a ggplot2 add-on to provide a publication-ready theme  
 
-# Import and tidy data ################################################################################################
-df <- read.csv("./data/clean_data/AqFl2_qPCR_ref_DI.csv", header = T, na.strings = c(""), stringsAsFactors = FALSE)
+# Import and tidy data #########################################################
+df <- read_csv("data/clean_data/AqFl2_qPCR_ref_DI.csv", col_names = T, na = "") 
+               
 head(df, n = 20L)
 str(df)
 
@@ -18,12 +19,12 @@ df <- df %>%
   mutate(Quantity_std = scale(Quantity), # standardize mRNA quantity of each reference gene
          Quantity_nm = Quantity / Quantity[1]) # normalize mRNA quantity of each reference gene to the first sample
 
-# Exploratory analysis ################################################################################################ 
+# Exploratory analysis #########################################################
 # Convert character to factor, specifying the desired orders to be shown on plots
 df$Diet <- factor(df$Diet, levels = c("REF", "IM"))
 df$Sample_ID <- factor(df$Sample_ID, levels = unique(df$Sample_ID)) # use the exact order of Sample_ID column
 
-# Point diagram -----------------------------------------------------------------------------------
+# Point diagram ----------------------------------------------------------------
 # make a dataframe containing the grand mean of mRNA quantity per reference gene
 gm <- df %>% 
   group_by(Ref_gene) %>%
@@ -53,13 +54,13 @@ p2 <- df %>%
 # Combine the plots
 plot_grid(p1, p2, ncol = 1, align = "v", rel_heights = c(3, 2))
 
-ggsave('./analysis/exploratory_analysis/qPCR_ref_DI_pointDiagram.pdf', 
+ggsave('analysis/exploratory_analysis/qPCR_ref_DI_pointDiagram.pdf', 
        units = "in", 
        dpi = 300,
        height = 10,
        width = 8)
 
-# Boxplot -----------------------------------------------------------------------------------------
+# Boxplot ----------------------------------------------------------------------
 # convert Sample_ID as character, otherwise ggrepel won't work properly
 df$Sample_ID <- as.character(df$Sample_ID)
 
@@ -72,30 +73,35 @@ is_outlier <- function(x) {
 df %>% 
   group_by(Ref_gene) %>%
   mutate(outlier = is_outlier(Quantity_std)) %>%
-  ggplot(aes(x = Ref_gene, y = Quantity_std, label = ifelse(outlier, Sample_ID, NA))) +
+  ggplot(aes(x = Ref_gene, y = Quantity_std, 
+             label = ifelse(outlier, Sample_ID, NA))) +
   geom_boxplot(outlier.shape = NA) +
-  geom_point(aes(fill = Diet), size = 3, shape = 21, position = position_jitterdodge(0.2)) +
+  geom_point(aes(fill = Diet), size = 3, shape = 21, 
+             position = position_jitterdodge(0.2)) +
   ggrepel::geom_label_repel() + # label outliers with Sample_ID
   ylab("Standardized mRNA quantity") +
   theme_cowplot()
 
-ggsave('./analysis/exploratory_analysis/qPCR_ref_DI_boxPlot.pdf', units = "in", dpi = 300)
+ggsave('analysis/exploratory_analysis/qPCR_ref_DI_boxPlot.pdf', 
+       units = "in", dpi = 300)
 
-# Barplot -----------------------------------------------------------------------------------------
+# Barplot ----------------------------------------------------------------------
 df %>%
   ggplot(aes(x = Diet, y =  Mean, fill = Diet)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") +
   geom_errorbar(aes(ymin = Mean, ymax = Mean + SD), size = 0.3, width = 0.2) + # add error bar (sd)
   facet_wrap(~ Ref_gene, nrow = 1, scales = "free_y") +
-  scale_y_continuous(limits = c(0, NA), expand = expand_scale(mult = c(0, 0.1))) + 
+  scale_y_continuous(limits = c(0, NA), 
+                     expand = expand_scale(mult = c(0, 0.1))) + 
   ylab("mRNA quantity") +
   theme_bw() +
   theme(axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12))
 
-ggsave('./analysis/exploratory_analysis/qPCR_ref_DI_barPlot.pdf', units = "in", dpi = 300)
+ggsave('analysis/exploratory_analysis/qPCR_ref_DI_barPlot.pdf', 
+       units = "in", dpi = 300)
 
-# Rank reference genes by coefficient of variation and F statistic ###################################################
+# Rank reference genes by coefficient of variation and F statistic #############
 # Calculate coefficient of variance (cv), measuring overall stability of reference genes across all the samples
 cv <- df %>% 
   group_by(Ref_gene) %>%
@@ -129,9 +135,9 @@ smr$Quantity_CV <- formatC(smr$Quantity_CV, format = "f", digits = 1)
 smr$Quantity_F <- formatC(smr$Quantity_F, format = "f", digits = 4)
 
 # Export summary table
-pdf('./results/reference_gene_ranks/ref_gene_rank_DI.pdf', width = 12)
+pdf('results/reference_gene_ranks/ref_gene_rank_DI.pdf', width = 12)
 gridExtra::grid.table(smr)
 dev.off()
 
 # Get session info
-writeLines(capture.output(sessionInfo()), "./analysis/code/qPCR_ref_DI_sessionInfo.txt")
+writeLines(capture.output(sessionInfo()), "analysis/code/qPCR_ref_DI_sessionInfo.txt")

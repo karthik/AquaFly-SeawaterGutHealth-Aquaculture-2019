@@ -6,10 +6,7 @@ library(ordinal) # run ordered logistic regression
 library(broom) # tidy model outputs
 
 # Import and tidy data #########################################################
-df <- read.csv("./data/raw_data/AqFl2_histology.csv", 
-               header = T, 
-               na.strings = c(""), 
-               stringsAsFactors = FALSE)
+df <- read_csv("data/raw_data/AqFl2_histology.csv", col_names = T, na = "") 
 
 head(df, n = 20L) 
 str(df)
@@ -41,7 +38,7 @@ ggplot(df, aes(Rank, fill = Net_pen)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_brewer(palette = "Dark2")
 
-ggsave('./results/exploratory_analysis/histology_histogram.pdf', 
+ggsave('analysis/exploratory_analysis/histology_histogram.pdf', 
        units = "in", 
        dpi = 300,
        height = 8,
@@ -63,7 +60,7 @@ olr <- df %>%
   group_by(Gut_segment, Variable) %>% 
   nest() %>% 
   mutate(mod_clmm   = map(data, ~clmm(Rank_agr ~ Diet + (1|Net_pen),
-                                     data = .x, Hess = TRUE, nAGQ = 10)), # full model with random effect. 
+                                     data = .x, Hess = T, nAGQ = 10)), # full model with random effect. 
          mod_clm    = map(data, ~clm(Rank_agr ~ Diet, data = .x)), # sub model without random effect
          smr_clmm   = map(mod_clmm, ~summary(.x)), # model summary
          smr_clm    = map(mod_clm, ~summary(.x)),
@@ -87,19 +84,19 @@ mod_clmm <- olr %>%
   select(1:3) %>%
   filter(Gut_segment == "MI" & Variable %in% c("hpv", "smc")) %>%
   mutate(mod_clmm      = map(data, ~clmm2(Rank_agr ~ Diet, random = Net_pen,
-                                          data = .x, Hess = TRUE, nAGQ = 10)),
+                                          data = .x, Hess = T, nAGQ = 10)),
          mod_clmm_nom  = map(data, ~clmm2(Rank_agr ~ 1, random = Net_pen, 
-                                          data = .x, Hess = TRUE, nAGQ = 10,
+                                          data = .x, Hess = T, nAGQ = 10,
                                           nominal = ~Diet)), # nominal effect is not available in clmm 
          mod_clmm_sca  = map(data, ~clmm2(Rank_agr ~ Diet, random = Net_pen, 
-                                          data = .x, Hess = TRUE, nAGQ = 10,
+                                          data = .x, Hess = T, nAGQ = 10,
                                           scale = ~Diet)), # scale effect is not available in clmm
          lrt_nom       = map2(mod_clmm, mod_clmm_nom, anova), # likelihood ratio test of proportional odds assumption via nominal effect
          lrt_sca       = map2(mod_clmm, mod_clmm_sca, anova), # likelihood ratio test of proportional odds assumption via scale effect
          p_nom         = map_dbl(lrt_nom, ~.x[2, "Pr(Chi)"]),
          p_sca         = map_dbl(lrt_sca, ~.x[2, "Pr(Chi)"]),
          mod_clmm_drop = map(data, ~clmm2(Rank_agr ~ 1, random = Net_pen,
-                                          data = .x, Hess = TRUE, nAGQ = 10)), # drop1 works for clmm objects but not clmm2 objects
+                                          data = .x, Hess = T, nAGQ = 10)), # drop1 works for clmm objects but not clmm2 objects
          lrt_fixef     = map2(mod_clmm, mod_clmm_drop, anova), # likelihood ratio test of the diet effect
          p_diet        = map_dbl(lrt_fixef, ~.x[2, "Pr(Chi)"])
   )
@@ -112,7 +109,7 @@ plot.ranef <- function(mod) { # mod should be a clmm2 object
   ci <- mod$ranef + qnorm(0.975) * sqrt(mod$condVar) %o% c(-1, 1)
   ord.re <- order(mod$ranef)
   ci <- ci[order(mod$ranef), ]
-  plot(1:nc, mod$ranef[ord.re], axes = FALSE, ylim = range(ci),
+  plot(1:nc, mod$ranef[ord.re], axes = F, ylim = range(ci),
        xlab = rn, ylab = paste0(rn, " effect"))
   axis(1, at = 1:nc, labels = ord.re)
   axis(2)
@@ -229,7 +226,7 @@ p2 <- df_bar %>%
   geom_bar(aes(fill = forcats::fct_rev(Rank)), stat = "identity") +
   facet_wrap(~ Variable, nrow = 1) +
   scale_fill_manual(values = my_col, 
-                    drop = FALSE) + # forces legend to show all categories
+                    drop = F) + # forces legend to show all categories
   scale_y_continuous(limits = c(0, 105), 
                      breaks = 0:5*20, 
                      expand = expand_scale(mult = c(0, 0.05))) +
@@ -273,7 +270,7 @@ p1 <- p1 + geom_signif(data = ann,
                            y_position  = y),
                        textsize = 4, 
                        tip_length = 0,
-                       manual = TRUE)
+                       manual = T)
 
 # Combine figures --------------------------------------------------------------
 # Extract legend from one of the figures and use it as the shared legend
@@ -290,7 +287,7 @@ lom <- cbind(c(1, 2, 3),
             )
 
 # Use gridExtra::grid.arrange to combine the figures
-tiff('./results/figures/Figure 2.tiff', 
+tiff('results/figures/Figure 2.tiff', 
      compression = "lzw",
      units = "in", 
      res = 300, 
@@ -302,4 +299,4 @@ grid.arrange(grobs = gl, layout_matrix = lom)
 dev.off()
 
 # Get session info
-writeLines(capture.output(sessionInfo()), "./code/histology_sessionInfo.txt")
+writeLines(capture.output(sessionInfo()), "analysis/code/histology_sessionInfo.txt")
