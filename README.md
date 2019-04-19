@@ -3,8 +3,9 @@ This repository contains the data and code to reproduce the results presented in
 
 To run the analyses, download this repository as a zipped file. After decompression, open the R project file (AqFl2_GutHealth.Rproj) in the RStudio and run the R codes directly from the project root directory. Versions of R packages for each anaylsis can be found in the session information (*_sessionInfo.txt) under the same folder of R codes.
 
-Below is the file organization in this repository.
+Below is an overview of the file organization descending to level-3 directories.
 ```
+root
 ├── analysis
 │   ├── code
 │   │   ├── histology.R
@@ -53,94 +54,6 @@ Below is the file organization in this repository.
 │   ├── raw_data
 │   │   ├── AqFl2_histology.csv
 │   │   ├── AqFl2_LightCycler_files
-│   │   │   ├── DI
-│   │   │   │   ├── ref_gene
-│   │   │   │   │   ├── AqFl2_DI_actb_ann temp 60.lc96p
-│   │   │   │   │   ├── AqFl2_DI_gapdh_ann temp 60.lc96p
-│   │   │   │   │   ├── AqFl2_DI_hprt1_ann temp 60.lc96p
-│   │   │   │   │   └── AqFl2_DI_rnapo2_ann temp 60.lc96p
-│   │   │   │   └── target_gene
-│   │   │   │       ├── AqFl2_DI_apoa1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_apoa4_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_apob_ann temp 63.lc96p
-│   │   │   │       ├── AqFl2_DI_aqp8ab_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_casp6_ann temp 60_.lc96p
-│   │   │   │       ├── AqFl2_DI_cat_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_cd3gd_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_cd8b_ann temp 59.lc96p
-│   │   │   │       ├── AqFl2_DI_chk_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_cldn15_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_cldn25b_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_cyp1a1_ann temp 55.lc96p
-│   │   │   │       ├── AqFl2_DI_Ecad_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_fabp2b_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_foxp3_ann temp 62.lc96p
-│   │   │   │       ├── AqFl2_DI_hsp70_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_ifng_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_il10_ann temp 62.lc96p
-│   │   │   │       ├── AqFl2_DI_il17a_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_il1b_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_il4_ann temp 62.lc96p
-│   │   │   │       ├── AqFl2_DI_il6_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_il8_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_mhcI_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_mmp13_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_mta_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_mtp_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_muc2_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_myd88_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_pcna_ann temp 55.lc96p
-│   │   │   │       ├── AqFl2_DI_pcyt1a_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_plin2_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_sod1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_tgfb1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_DI_tnfa_ann temp 60.lc96p
-│   │   │   │       └── AqFl2_DI_zo1_ann temp 60.lc96p
-│   │   │   ├── PI
-│   │   │   │   ├── ref_gene
-│   │   │   │   │   ├── AqFl2_PI60_RefGenes_ann temp 60.lc96p
-│   │   │   │   │   ├── AqFl2_PI_actb_ann temp 60.lc96p
-│   │   │   │   │   ├── AqFl2_PI_gapdh_ann temp 60.lc96p
-│   │   │   │   │   ├── AqFl2_PI_hprt1_ann temp 60.lc96p
-│   │   │   │   │   └── AqFl2_PI_rnapo2_ann temp 60.lc96p
-│   │   │   │   └── target_gene
-│   │   │   │       ├── AqFl2_PI_apoa1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_apoa4_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_apob_ann temp 63.lc96p
-│   │   │   │       ├── AqFl2_PI_aqp8ab_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_casp6_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_cat_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_cd3gd_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_cd8b_ann temp 59.lc96p
-│   │   │   │       ├── AqFl2_PI_cdh1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_chk_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_cldn15_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_cldn25b_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_cyp1a1_ann temp 55.lc96p
-│   │   │   │       ├── AqFl2_PI_fabp2b_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_foxp3_ann temp 62.lc96p
-│   │   │   │       ├── AqFl2_PI_hsp70_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_ifng_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_il10_ann temp 62.lc96p
-│   │   │   │       ├── AqFl2_PI_il17a_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_il1b_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_il4_ann temp 62.lc96p
-│   │   │   │       ├── AqFl2_PI_il6_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_il8_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_mhcI_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_mmp13_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_mta_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_mtp_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_muc2_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_myd88_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_pcna_ann temp 55.lc96p
-│   │   │   │       ├── AqFl2_PI_pcyt1a_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_plin2_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_sod1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_tgfb1_ann temp 60.lc96p
-│   │   │   │       ├── AqFl2_PI_tnfa_ann temp 60.lc96p
-│   │   │   │       └── AqFl2_PI_zo1_ann temp 60.lc96p
-│   │   │   └── README.md
 │   │   └── AqFl2_organosomatic_index.csv
 │   └── README.md
 ├── LICENSE
