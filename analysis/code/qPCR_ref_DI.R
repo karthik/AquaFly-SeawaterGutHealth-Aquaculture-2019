@@ -69,6 +69,9 @@ is_outlier <- function(x) {
   x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x)
 }
 
+# Set seed to make jitter points reproducible
+set.seed(1910)
+
 # Make boxplot using standardized mRNA quantity
 df %>% 
   group_by(Ref_gene) %>%

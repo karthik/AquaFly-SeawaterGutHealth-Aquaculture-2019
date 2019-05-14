@@ -80,6 +80,9 @@ is_outlier <- function(x) {
   x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x)
 }
 
+# Set seed to make jitter points reproducible
+set.seed(1910)
+
 # Make boxplots
 df %>%
   group_by(Target, Diet) %>%
@@ -301,10 +304,11 @@ lmerML_nsf_nofix <- lapply(lmerML_nsf, function(x) update(x, . ~ . - Diet))
 nc <- parallel::detectCores() 
 clus <- parallel::makeCluster(rep("localhost", nc)) 
 
+# Set seed to make parametric bootstrap reproducible
+set.seed(1910)
+
 # Parametric bootstrap comparisons 
-pb <- map2(lmerML_nsf, 
-           lmerML_nsf_nofix, 
-           ~PBmodcomp(.x, .y, seed = 1910, cl = clus))
+pb <- map2(lmerML_nsf, lmerML_nsf_nofix, ~PBmodcomp(.x, .y, cl = clus))
 
 # Stop the clusters
 parallel::stopCluster(clus)

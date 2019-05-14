@@ -55,6 +55,10 @@ ggplot(df, aes(x = Diet, y = OSI)) +
 ggsave('analysis/exploratory_analysis/OSI_violin.pdf', units = "in", dpi = 300)
 
 # Box plot to check outliers and explore random effect, i.e., net pen ----------
+# Set seed to make jitter points reproducible
+set.seed(1910)
+
+# Make box plot
 df %>%
   group_by(Gut_segment, Diet) %>%
   mutate(outlier = is_outlier(OSI)) %>% 
@@ -165,8 +169,11 @@ lmerML_nofix <- update(lmerML[["DI"]], . ~ . - Diet)
 nc <- parallel::detectCores() 
 clus <- parallel::makeCluster(rep("localhost", nc)) 
 
+# Set seed to make parametric bootstrap reproducible
+set.seed(1910)
+
 # Parametric bootstrap comparisons 
-pb <- PBmodcomp(lmerML[["DI"]], lmerML_nofix, seed = 1910, cl = clus)
+pb <- PBmodcomp(lmerML[["DI"]], lmerML_nofix, cl = clus)
 
 # Stop the clusters
 parallel::stopCluster(clus)
@@ -178,6 +185,9 @@ p_val <- data.frame("Gut_segment" = names(lmerML),
                                       pb$test["PBtest", "p.value"]))  
                     
 # Make Figure 1 ################################################################
+# Set seed to make jitter points reproducible
+set.seed(1910)
+
 # Initial plot
 fig <- df %>% 
   ggplot(aes(x = Diet, y = OSI)) +
