@@ -5,27 +5,31 @@ Running under: Windows >= 8 x64 (build 9200)
 Matrix products: default
 
 locale:
-[1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252    LC_MONETARY=English_United States.1252
-[4] LC_NUMERIC=C                           LC_TIME=English_United States.1252    
+[1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252   
+[3] LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.1252    
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] pbkrtest_0.4-7     influence.ME_0.9-9 lme4_1.1-21        Matrix_1.2-17      ggsignif_0.5.0     ggpubr_0.2.999    
- [7] magrittr_1.5       forcats_0.4.0      stringr_1.4.0      dplyr_0.8.0.1      purrr_0.3.2        readr_1.3.1       
-[13] tidyr_0.8.3        tibble_2.1.1       ggplot2_3.1.1      tidyverse_1.2.1   
+ [1] pbkrtest_0.4-7     influence.ME_0.9-9 lme4_1.1-21        Matrix_1.2-17      ggsignif_0.5.0    
+ [6] ggpubr_0.2.999     magrittr_1.5       forcats_0.4.0      stringr_1.4.0      dplyr_0.8.0.1     
+[11] purrr_0.3.2        readr_1.3.1        tidyr_0.8.3        tibble_2.1.1       ggplot2_3.1.1     
+[16] tidyverse_1.2.1   
 
 loaded via a namespace (and not attached):
- [1] httr_1.4.0          jsonlite_1.6        splines_3.5.2       modelr_0.1.4        Formula_1.2-3       assertthat_0.2.1   
- [7] latticeExtra_0.6-28 cellranger_1.1.0    ggrepel_0.8.0       yaml_2.2.0          pillar_1.3.1        backports_1.1.3    
-[13] lattice_0.20-38     glue_1.3.1          digest_0.6.18       RColorBrewer_1.1-2  checkmate_1.9.1     rvest_0.3.2        
-[19] minqa_1.2.4         colorspace_1.4-1    cowplot_0.9.99      htmltools_0.3.6     plyr_1.8.4          pkgconfig_2.0.2    
-[25] broom_0.5.2         haven_2.1.0         scales_1.0.0        htmlTable_1.13.1    generics_0.0.2      withr_2.1.2        
-[31] nnet_7.3-12         lazyeval_0.2.2      cli_1.1.0           survival_2.44-1.1   crayon_1.3.4        readxl_1.3.1       
-[37] fansi_0.4.0         nlme_3.1-137        MASS_7.3-51.3       xml2_1.2.0          foreign_0.8-71      tools_3.5.2        
-[43] data.table_1.12.2   hms_0.4.2           munsell_0.5.0       cluster_2.0.7-1     compiler_3.5.2      rlang_0.3.4        
-[49] grid_3.5.2          nloptr_1.2.1        rstudioapi_0.10     htmlwidgets_1.3     base64enc_0.1-3     labeling_0.3       
-[55] boot_1.3-20         gtable_0.3.0        R6_2.4.0            gridExtra_2.3       lubridate_1.7.4     knitr_1.22         
-[61] utf8_1.1.4          Hmisc_4.2-0         stringi_1.4.3       parallel_3.5.2      Rcpp_1.0.1          rpart_4.1-13       
-[67] acepack_1.4.1       tidyselect_0.2.5    xfun_0.6           
+ [1] httr_1.4.0          jsonlite_1.6        splines_3.5.2       modelr_0.1.4        Formula_1.2-3      
+ [6] assertthat_0.2.1    latticeExtra_0.6-28 cellranger_1.1.0    ggrepel_0.8.0       yaml_2.2.0         
+[11] pillar_1.3.1        backports_1.1.4     lattice_0.20-38     glue_1.3.1          digest_0.6.18      
+[16] RColorBrewer_1.1-2  checkmate_1.9.1     rvest_0.3.3         minqa_1.2.4         colorspace_1.4-1   
+[21] cowplot_0.9.99      htmltools_0.3.6     plyr_1.8.4          pkgconfig_2.0.2     broom_0.5.2        
+[26] haven_2.1.0         scales_1.0.0        htmlTable_1.13.1    generics_0.0.2      withr_2.1.2        
+[31] nnet_7.3-12         lazyeval_0.2.2      cli_1.1.0           survival_2.44-1.1   crayon_1.3.4       
+[36] readxl_1.3.1        fansi_0.4.0         nlme_3.1-137        MASS_7.3-51.3       xml2_1.2.0         
+[41] foreign_0.8-71      tools_3.5.2         data.table_1.12.2   hms_0.4.2           munsell_0.5.0      
+[46] cluster_2.0.7-1     compiler_3.5.2      rlang_0.3.4         grid_3.5.2          nloptr_1.2.1       
+[51] rstudioapi_0.10     htmlwidgets_1.3     base64enc_0.1-3     labeling_0.3        boot_1.3-20        
+[56] gtable_0.3.0        R6_2.4.0            gridExtra_2.3       lubridate_1.7.4     knitr_1.22         
+[61] utf8_1.1.4          Hmisc_4.2-0         stringi_1.4.3       parallel_3.5.2      Rcpp_1.0.1         
+[66] rpart_4.1-13        acepack_1.4.1       tidyselect_0.2.5    xfun_0.6           
