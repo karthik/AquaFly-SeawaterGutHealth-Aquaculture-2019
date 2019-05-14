@@ -189,7 +189,7 @@ p_val <- data.frame("Gut_segment" = names(lmerML),
 set.seed(1910)
 
 # Initial plot
-fig <- df %>% 
+p <- df %>% 
   ggplot(aes(x = Diet, y = OSI)) +
   geom_boxplot(aes(fill = Diet), outlier.shape = NA) +
   geom_jitter(shape = 16, position = position_jitter(0.2)) +
@@ -201,26 +201,26 @@ fig <- df %>%
   cowplot::theme_cowplot() +
   scale_fill_brewer(palette = "Dark2")
 
-# Add significant p values to the plot -----------------------------------------
+# Add p values to the plot -----------------------------------------------------
 # Make a datafraome for the p-value annotation
-ann <- filter(p_val, p_values <= 0.05) %>% # retain rows with p vales smaller than 0.05 for the annotation
-       mutate(p_values = formatC(p_values, format = "f", digits = 3), # format digits of p values
+ann <- mutate(p_val, 
+              p_values = formatC(p_values, format = "f", digits = 3), # format digits of p values
               p_values = paste("p = ", p_values), # add label "p =" to p values
-              start    = rep("REF", nrow(.)), # start position of p value labeling on x axis
-              end      = rep("IM", nrow(.)), # end position of p value labeling on x axis
-              y        = rep(0.47, nrow(.)) # position of p value label on y axis
+              start    = rep("REF", nrow(p_val)), # start position of p value labeling on x axis
+              end      = rep("IM", nrow(p_val)), # end position of p value labeling on x axis
+              y        = c(3.6, 0.33, 0.47) # position of p value label on y axis
               ) 
   
 
 # Add the significant p values. The warning about the missing aesthetics can be ignored.
-fig + geom_signif(data = ann, 
-                  aes(xmin = start, 
-                      xmax = end, 
-                      annotations = p_values, 
-                      y_position = y),
-                  textsize = 4, 
-                  tip_length = 0,
-                  manual = T)
+p + geom_signif(data = ann, 
+                aes(xmin = start, 
+                    xmax = end, 
+                    annotations = p_values, 
+                    y_position = y),
+                textsize = 4, 
+                tip_length = 0,
+                manual = T)
 
 ggsave('results/figures/Figure 1.tiff', units = "in", dpi = 300, compression = "lzw")
 

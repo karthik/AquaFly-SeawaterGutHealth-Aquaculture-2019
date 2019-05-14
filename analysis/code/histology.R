@@ -170,7 +170,7 @@ p_diet <- rbind(mod_clmm[ , c("Gut_segment", "Variable", "p_diet")],
                 mod_clm_po[ , c("Gut_segment", "Variable", "p_diet")],
                 mod_clm_npo[ , c("Gut_segment", "Variable", "p_diet")])
 
-# Apply multiple comparison correction
+# Apply multiple comparison correction for each gut segment
 p_diet <- p_diet %>%
   group_by(Gut_segment) %>% # correct p values for each gut segment
   nest() %>%
@@ -216,7 +216,7 @@ p1 <- df_bar %>%
                      expand = expand_scale(mult = c(0, 0.05))) +
   labs(title = "PI", y = "%") +
   guides(fill = guide_legend(title = "Rank")) + 
-  theme_cowplot() +
+  theme_cowplot(font_size = 16) +
   theme(plot.title = element_text(hjust = 0), 
         legend.position = "none")
 
@@ -231,7 +231,7 @@ p2 <- df_bar %>%
                      breaks = 0:5*20, 
                      expand = expand_scale(mult = c(0, 0.05))) +
   labs(title = "MI", y = "%") +
-  theme_cowplot() +
+  theme_cowplot(font_size = 16) +
   theme(plot.title = element_text(hjust = 0),
         legend.position = "none")
 
@@ -245,33 +245,52 @@ p3 <- df_bar %>%
                      breaks = 0:5*20, 
                      expand = expand_scale(mult = c(0, 0.05))) +
   labs(title = "DI", y = "%") +
-  theme_cowplot() +
+  theme_cowplot(font_size = 16) +
   theme(plot.title = element_text(hjust = 0), 
         legend.position = "none")
 
-# Add significant p values to the plots ----------------------------------------
-# Make a datafraome for the p-value annotation
+# Add p values to the plots ----------------------------------------------------
+# Make p vlaue annotations
 ann <- p_diet %>%
-  filter(p_diet_adj <= 0.05) %>%
-  mutate(Variable = gsub("hpv", "Hypervacuolization", Variable), # match facet label
+  mutate(Variable = gsub("hpv", "Hypervacuolization", Variable), 
+         Variable = gsub("lpc", "Lamina propria cellularity", Variable),
+         Variable = gsub("mfh", "Mucosal fold height", Variable),
          Variable = gsub("smc", "Submucosal cellularity", Variable),
+         Variable = gsub("snv", "Supranuclear vacuolization", Variable),
          p_diet_adj = formatC(p_diet_adj, format = "f", digits = 3), # format digits of p values
          p_diet_adj = paste("p = ", p_diet_adj), # add label "p =" to p values
          start = rep("REF", nrow(.)), # start position of p value label on x axis
          end = rep("IM", nrow(.)), # end position of p value label on x axis
          y = rep(103, nrow(.)) # position of p value label on y axis
-         ) 
- 
-# Add the p values. The warning about the missing aesthetics can be ignored
-p1 <- p1 + geom_signif(data = ann,
-                       aes(xmin        = start, 
-                           xmax        = end, 
+  ) 
+
+# Add p values to the plots. The warning about the missing aesthetics can be ignored
+p1 <- p1 + geom_signif(data = filter(ann, Gut_segment == "PI"),
+                       aes(xmin = start, 
+                           xmax = end, 
                            annotations = p_diet_adj, 
-                           y_position  = y),
+                           y_position = y),
                        textsize = 4, 
                        tip_length = 0,
                        manual = T)
 
+p2 <- p2 + geom_signif(data = filter(ann, Gut_segment == "MI"),
+                       aes(xmin = start, 
+                           xmax = end, 
+                           annotations = p_diet_adj, 
+                           y_position = y),
+                       textsize = 4, 
+                       tip_length = 0,
+                       manual = T)
+
+p3 <- p3 + geom_signif(data = filter(ann, Gut_segment == "DI"),
+                       aes(xmin = start, 
+                           xmax = end, 
+                           annotations = p_diet_adj, 
+                           y_position = y),
+                       textsize = 4, 
+                       tip_length = 0,
+                       manual = T)
 # Combine figures --------------------------------------------------------------
 # Extract legend from one of the figures and use it as the shared legend
 legend <- get_legend(p1 + theme(legend.position = "right"))
@@ -280,21 +299,20 @@ legend <- get_legend(p1 + theme(legend.position = "right"))
 gl <- list("1" = p1, "2" = p2, "3" = p3, "4" = legend)  
 
 # Make a layout matrix to guide the layout of figures
-lom <- cbind(c(1, 2, 3),
-             c(1, 2, 3), 
-             c(1, 2, 3), 
-             c("NA", 4, 3)
-            )
+layout <- cbind(c(1, 2, 3),
+                c(1, 2, 3), 
+                c(1, 2, 3), 
+                c("NA", 4, 3))
 
 # Use gridExtra::grid.arrange to combine the figures
 tiff('results/figures/Figure 2.tiff', 
      compression = "lzw",
      units = "in", 
      res = 300, 
-     height = 12,
-     width = 10)
+     height = 14,
+     width = 12)
 
-grid.arrange(grobs = gl, layout_matrix = lom)
+grid.arrange(grobs = gl, layout_matrix = layout)
 
 dev.off()
 
