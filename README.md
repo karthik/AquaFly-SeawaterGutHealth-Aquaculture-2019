@@ -1,3 +1,7 @@
+<!-- badges: start -->
+[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/KrogdahlLab/AquaFly-SeawaterGutHealth-Aquaculture-2018/master?urlpath=rstudio)
+<!-- badges: end -->
+
 # AquaFly-SeawaterGutHealth-Aquaculture-2019
 This repository contains the data and code to reproduce the results presented in the paper **Total replacement of fish meal with black soldier fly (*Hermetia illucens*) larvae meal does not compromise the gut health of Atlantic salmon (*Salmo salar*)**.
 
@@ -68,7 +72,3 @@ root
         ├── ref_gene_rank_DI.pdf
         └── ref_gene_rank_PI.pdf
 ```
-
-<!-- badges: start -->
-[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/KrogdahlLab/AquaFly-SeawaterGutHealth-Aquaculture-2018/master?urlpath=rstudio)
-<!-- badges: end -->
