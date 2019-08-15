@@ -5,7 +5,9 @@
 # AquaFly-SeawaterGutHealth-Aquaculture-2019
 This repository contains the data and code to reproduce the results presented in the paper **Total replacement of fish meal with black soldier fly (*Hermetia illucens*) larvae meal does not compromise the gut health of Atlantic salmon (*Salmo salar*)**.
 
-To run the analyses, download this repository as a zipped file. After decompression, open the R project file (`AqFl2_GutHealth.Rproj`) in the RStudio and run the R codes directly from the project root directory. Versions of R packages for each anaylsis can be found in the session information (*_sessionInfo.txt) under the same folder of R codes.
+To rerun the analyses online, simply click on the Binder badge. Note that this's still under testing and may fail.
+
+To rerun the analyses locally, download this repository as a zipped file. After decompression, open the R project file (`AqFl2_GutHealth.Rproj`) in the RStudio and run the R codes directly from the project root directory. Versions of R packages for each anaylsis can be found in the session information (*_sessionInfo.txt) under the same folder of R codes.
 
 Below is an overview of the file organization descending to level-3 directories.
 ```
