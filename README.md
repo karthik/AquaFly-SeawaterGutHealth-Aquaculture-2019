@@ -68,3 +68,7 @@ root
         ├── ref_gene_rank_DI.pdf
         └── ref_gene_rank_PI.pdf
 ```
+
+<!-- badges: start -->
+[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/KrogdahlLab/AquaFly-SeawaterGutHealth-Aquaculture-2018/master?urlpath=rstudio)
+<!-- badges: end -->
