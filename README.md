@@ -1,5 +1,5 @@
 <!-- badges: start -->
-[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/KrogdahlLab/AquaFly-SeawaterGutHealth-Aquaculture-2018/master?urlpath=rstudio)
+[![Launch Rstudio Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/karthik/AquaFly-SeawaterGutHealth-Aquaculture-2019/master?urlpath=rstudio)
 <!-- badges: end -->
 
 # AquaFly-SeawaterGutHealth-Aquaculture-2019
